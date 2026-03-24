@@ -7,8 +7,10 @@ import { Preloader } from "features/world/scenes/Preloader";
 import { PortalContext } from "./lib/PortalProvider";
 import { useActor } from "@xstate/react";
 import { PortalExampleScene } from "./PortalExampleScene";
+import { CasinoIslandScene } from "./CasinoIslandScene";
 import { NPCModals } from "features/world/ui/NPCModals";
 import { InteractableModals } from "features/world/ui/InteractableModals";
+import { CONFIG } from "lib/config";
 
 export const PortalExamplePhaser: React.FC = () => {
   const { portalService } = useContext(PortalContext);
@@ -16,11 +18,14 @@ export const PortalExamplePhaser: React.FC = () => {
 
   const game = useRef<Game>(undefined);
 
-  // This must match the key of your scene [PortalExampleScene]
-  const scene = "portal_example";
+  // Determine which scene to load based on PORTAL_APP config
+  let scene = "portal_example";
+  let scenes: any[] = [Preloader, PortalExampleScene];
 
-  // Preloader is useful if you want to load the standard Sunflower Land assets + SFX
-  const scenes = [Preloader, PortalExampleScene];
+  if (CONFIG.PORTAL_APP === "casino-island") {
+    scene = "casino-island";
+    scenes = [Preloader, CasinoIslandScene];
+  }
 
   useEffect(() => {
     const config: Phaser.Types.Core.GameConfig = {
@@ -82,17 +87,28 @@ export const PortalExamplePhaser: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null);
 
   return (
-    <div>
-      <div id="game-content" ref={ref} />
-
-      {/* Comment out if you don't want to use our standard Bumpkin NPCs + click interactions */}
-      <NPCModals id={portalState.context.id as number} />
-
-      {/* Comment out if you don't want to use pop up modals from in game interactables */}
-      <InteractableModals
-        id={portalState.context.id as number}
-        scene="portal_example"
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 10,
+      }}
+    >
+      <div 
+        id="game-content" 
+        ref={ref}
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
       />
+
+      {/* NPCModals and InteractableModals require GameProvider context, which is not available in portal mode */}
+      {/* <NPCModals id={portalState.context.id as number} /> */}
+      {/* <InteractableModals id={portalState.context.id as number} scene={scene as any} /> */}
     </div>
   );
 };

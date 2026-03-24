@@ -61,12 +61,17 @@ export const CasinoIsland: React.FC<Props> = ({ onClose }) => {
 
 
   const playNow = () => {
+    // Disable autosave while playing casino island due to backend issues
+    console.log("[CasinoIsland] playNow clicked, sending START_CASINO_ISLAND event");
+    gameService.send("START_CASINO_ISLAND");
     setIsPlaying(true);
   };
 
   const onClaim = () => {
     gameService.send("minigame.prizeClaimed", { id: "casino-island" });
 
+    // Re-enable autosave when exiting casino island
+    gameService.send("END_CASINO_ISLAND");
     onClose();
   };
 
@@ -82,6 +87,15 @@ export const CasinoIsland: React.FC<Props> = ({ onClose }) => {
     setShowDailyChipsModal(true);
   }, []);
 
+  // Wrapper to handle autosave re-enable when closing Casino Island portal
+  const handlePortalClose = useCallback(() => {
+    if (isPlaying) {
+      gameService.send("END_CASINO_ISLAND");
+      setIsPlaying(false);
+    }
+    onClose();
+  }, [isPlaying, gameService, onClose]);
+
   // Register the chest click handler in the global event emitter
   useEffect(() => {
     console.log("[CasinoIsland] Registering chest click handler in casinoIslandEvents");
@@ -93,6 +107,24 @@ export const CasinoIsland: React.FC<Props> = ({ onClose }) => {
     };
   }, [handleChestClicked]);
 
+  // Handle exiting casino island minigame
+  useEffect(() => {
+    return () => {
+      if (isPlaying) {
+        // Re-enable autosave when component unmounts while playing
+        gameService.send("END_CASINO_ISLAND");
+      }
+    };
+  }, [isPlaying, gameService]);
+
+  // Re-enable autosave when exiting casino island page entirely
+  useEffect(() => {
+    return () => {
+      gameService.send("END_CASINO_ISLAND");
+      console.log("[CasinoIsland] Component unmounting, sent END_CASINO_ISLAND");
+    };
+  }, [gameService]);
+
   if (isPlaying) {
     // Show daily chips modal if triggered while playing
     if (showDailyChipsModal) {
@@ -100,7 +132,7 @@ export const CasinoIsland: React.FC<Props> = ({ onClose }) => {
         // Already claimed today
         return (
           <div>
-            <Portal portalName="casino-island" onClose={onClose} onChestClicked={handleChestClicked} />
+            <Portal portalName="casino-island" onClose={handlePortalClose} onChestClicked={handleChestClicked} />
             <ClaimReward
               onClaim={() => setShowDailyChipsModal(false)}
               reward={{
@@ -121,7 +153,7 @@ export const CasinoIsland: React.FC<Props> = ({ onClose }) => {
         // Already at max chips
         return (
           <div>
-            <Portal portalName="casino-island" onClose={onClose} onChestClicked={handleChestClicked} />
+            <Portal portalName="casino-island" onClose={handlePortalClose} onChestClicked={handleChestClicked} />
             <ClaimReward
               onClaim={() => setShowDailyChipsModal(false)}
               reward={{
@@ -142,7 +174,7 @@ export const CasinoIsland: React.FC<Props> = ({ onClose }) => {
       if (isEligibleForDailyChips && dailyChipsReward.gt(0)) {
         return (
           <div>
-            <Portal portalName="casino-island" onClose={onClose} onChestClicked={handleChestClicked} />
+            <Portal portalName="casino-island" onClose={handlePortalClose} onChestClicked={handleChestClicked} />
             <ClaimReward
               onClaim={onClaimDailyChips}
               reward={{
@@ -165,7 +197,7 @@ export const CasinoIsland: React.FC<Props> = ({ onClose }) => {
     // Show game without modal when no chips to reward
     return (
       <div>
-        <Portal portalName="casino-island" onClose={onClose} onChestClicked={handleChestClicked} />
+        <Portal portalName="casino-island" onClose={handlePortalClose} onChestClicked={handleChestClicked} />
       </div>
     );
   }

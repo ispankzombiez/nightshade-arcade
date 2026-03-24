@@ -14,6 +14,8 @@ import { translate } from "lib/i18n/translate";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { MineWhack } from "./MineWhack";
 import { Memory } from "./Memory";
+import { Poker } from "./Poker";
+import { CasinoIsland } from "./CasinoIsland";
 
 const host = window.location.host.replace(/^www\./, "");
 const LOCAL_STORAGE_KEY = `portal-chooser-${host}-${window.location.pathname}`;
@@ -79,6 +81,20 @@ export const PORTAL_OPTIONS: PortalOption[] = [
     title: translate("portal.memory.title"),
     description: translate("portal.memory.description"),
     component: Memory,
+  },
+  {
+    id: "poker",
+    npc: "billy",
+    title: translate("portal.pokerIsland.title"),
+    description: translate("portal.pokerIsland.description"),
+    component: Poker,
+  },
+  {
+    id: "casino-island",
+    npc: "billy",
+    title: translate("portal.casinoIsland.title"),
+    description: translate("portal.casinoIsland.description"),
+    component: CasinoIsland,
   },
 ];
 

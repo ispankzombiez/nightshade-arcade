@@ -36,9 +36,15 @@ const _visitedFarmId = (state: MachineState) =>
   state.context.visitorId ? state.context.farmId : undefined;
 
 export const useVisiting = () => {
-  const { gameService } = useContext(Context);
-  const isVisiting = useSelector(gameService, _isVisiting);
-  const visitedFarmId = useSelector(gameService, _visitedFarmId);
+  const context = useContext(Context);
+  
+  // In portal mode, Context is undefined. Default to visiting behavior.
+  if (!context) {
+    return { isVisiting: true, visitedFarmId: undefined };
+  }
+  
+  const isVisiting = useSelector(context.gameService, _isVisiting);
+  const visitedFarmId = useSelector(context.gameService, _visitedFarmId);
 
   return { isVisiting, visitedFarmId };
 };

@@ -94,7 +94,8 @@ export const PortalExample: React.FC = () => {
     <div>
       {gameState && (
         <>
-          <PortalExampleHUD />
+          {/* PortalExampleHUD requires GameProvider context. Will implement portal-specific HUD later */}
+          {/* <PortalExampleHUD /> */}
           <PortalExamplePhaser />
         </>
       )}

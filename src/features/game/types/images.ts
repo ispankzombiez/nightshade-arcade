@@ -34,6 +34,7 @@ import surimiRiceBowl from "assets/processedFoods/surimi_rice_bowl.webp";
 
 import gem from "assets/icons/gem.webp";
 import tradePoint from "assets/icons/trade_points_coupon.webp";
+import chip from "assets/icons/chip.png";
 
 import communityEgg from "assets/sfts/easter_donation_egg.webp";
 import hungryHare from "assets/sfts/hungryHare.png";
@@ -5262,6 +5263,11 @@ export const ITEM_DETAILS: Items = {
     image: gem,
     description: translate("description.gem"),
     translatedName: translate("currency.gem"),
+  },
+  Chip: {
+    image: chip,
+    description: translate("description.chip"),
+    translatedName: translate("currency.chip"),
   },
   "Squeaky Chicken": {
     image: squeakyChicken,

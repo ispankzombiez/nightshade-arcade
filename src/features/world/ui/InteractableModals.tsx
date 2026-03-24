@@ -51,6 +51,7 @@ import { Rarecrows } from "./Rarecrows";
 import { ChapterRaffles } from "./chapterRaffles/ChapterRaffles";
 import { FreeTrial } from "./FreeTrial";
 import { DailyChipsReward } from "./chests/DailyChipsReward";
+import { Poker } from "./portals/Poker";
 
 type InteractableName =
   | "guardian"
@@ -951,9 +952,12 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
         </CloseButtonPanel>
       </Modal>
       <Modal show={interactable === "casino_island_poker"} onHide={closeModal}>
-        <CloseButtonPanel onClose={closeModal} title="Poker">
-          {/* eslint-disable-next-line react/jsx-no-literals */}
-          <div className="p-4">Coming Soon</div>
+        <CloseButtonPanel
+          onClose={closeModal}
+          title="Poker"
+          bumpkinParts={NPC_WEARABLES.billy}
+        >
+          <Poker onClose={closeModal} />
         </CloseButtonPanel>
       </Modal>
       <Modal show={interactable === "casino_island_slots"} onHide={closeModal}>

@@ -359,6 +359,8 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         className="flex justify-center items-center cursor-pointer"
         onClick={() => {
           travel.play();
+          // Disable autosave while playing casino island due to backend issues
+          gameService.send("START_CASINO_ISLAND");
           navigate("/world/casino-island");
           onClose();
         }}
