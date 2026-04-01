@@ -12,6 +12,7 @@ import { BlackjackDeck } from "./deck";
 import { OuterPanel, InnerPanel } from "components/ui/Panel";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { startAttempt, submitScore } from "features/portal/lib/portalUtil";
+import ravenCoinIcon from "features/portal/nightshade-arcade/assets/RavenCoin.webp";
 import { PortalContext } from "../../lib/NightshadeArcadePortalProvider";
 import { PortalMachineState } from "../../lib/nightshadeArcadePortalMachine";
 import { useVipAccess } from "lib/utils/hooks/useVipAccess";
@@ -572,7 +573,20 @@ export const BlackjackGame: React.FC<BlackjackGameProps> = ({
           </div>
 
           <InnerPanel className="bg-yellow-100 p-4">
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-4 gap-4 text-center">
+              <div>
+                <div className="text-sm text-gray-700 font-semibold">
+                  REWARD
+                </div>
+                <div className="flex items-center justify-center gap-1 text-2xl font-bold text-yellow-700">
+                  {BLACKJACK_RAVEN_COIN_REWARD}
+                  <img
+                    src={ravenCoinIcon}
+                    alt="RavenCoin"
+                    className="w-6 h-6"
+                  />
+                </div>
+              </div>
               <div>
                 <div className="text-sm text-gray-700 font-semibold">CHIPS</div>
                 <div className="text-2xl font-bold text-yellow-700">
