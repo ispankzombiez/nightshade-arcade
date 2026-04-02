@@ -107,6 +107,10 @@ export class NightshadeArcadeScene extends BaseScene {
                 if (machineName === "machine 4") {
                   minigamesEventEmitter.emit({ type: "uno" });
                 }
+
+                if (machineName === "machine 5") {
+                  minigamesEventEmitter.emit({ type: "solitaire" });
+                }
               }
             });
         }

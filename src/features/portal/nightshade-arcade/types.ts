@@ -12,7 +12,8 @@ export type MinigameName =
   | "blackjack"
   | "roulette"
   | "gofish"
-  | "uno";
+  | "uno"
+  | "solitaire";
 
 export interface Coordinates {
   x: number;

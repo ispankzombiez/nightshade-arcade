@@ -113,11 +113,20 @@ export const NightshadeArcade: React.FC = () => {
       setShowMinigameModal(true);
     });
 
+    const unsubscribeSolitaire = minigamesEventEmitter.subscribe(
+      "solitaire",
+      () => {
+        setActiveMinigame("solitaire");
+        setShowMinigameModal(true);
+      },
+    );
+
     return () => {
       unsubscribePoker();
       unsubscribeBlackjack();
       unsubscribeGoFish();
       unsubscribeUno();
+      unsubscribeSolitaire();
     };
   }, []);
 
