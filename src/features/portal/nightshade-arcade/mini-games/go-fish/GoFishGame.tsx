@@ -5,13 +5,21 @@ import { Button } from "components/ui/Button";
 import { InnerPanel, OuterPanel } from "components/ui/Panel";
 import { SquareIcon } from "components/ui/SquareIcon";
 import { ITEM_DETAILS } from "features/game/types/images";
-import { startAttempt, submitScore } from "features/portal/lib/portalUtil";
+import {
+  purchase,
+  startAttempt,
+  submitScore,
+} from "features/portal/lib/portalUtil";
 import { useVipAccess } from "lib/utils/hooks/useVipAccess";
 import ravenCoinIcon from "features/portal/nightshade-arcade/assets/RavenCoin.webp";
 import { PortalContext } from "../../lib/NightshadeArcadePortalProvider";
 import { PortalMachineState } from "../../lib/nightshadeArcadePortalMachine";
 import { Card, CardRank } from "../poker/types";
 import { PokerDeck } from "../poker/deck";
+import {
+  EXTRA_REWARD_ATTEMPT_FLOWER_COST,
+  getRemainingPaidAttemptsForMinigame,
+} from "../poker/session";
 import {
   GO_FISH_RAVEN_COIN_REWARD,
   GoFishMode,
@@ -241,6 +249,12 @@ export const GoFishGame: React.FC<GoFishGameProps> = ({ onClose }) => {
   const hasRewardRun = useMemo(
     () => isGoFishRewardRunAvailable({ game: portalGameState, isVip }),
     [portalGameState, isVip],
+  );
+  const hasEnoughFlower =
+    Number(portalGameState.balance ?? 0) >= EXTRA_REWARD_ATTEMPT_FLOWER_COST;
+  const paidAttemptsRemaining = useMemo(
+    () => getRemainingPaidAttemptsForMinigame(portalGameState, "gofish"),
+    [portalGameState],
   );
 
   const startSession = useCallback(
@@ -604,6 +618,22 @@ export const GoFishGame: React.FC<GoFishGameProps> = ({ onClose }) => {
               Play without spending today's reward attempt.
             </div>
           </button>
+
+          {!hasRewardRun && paidAttemptsRemaining > 0 && (
+            <button
+              onClick={() =>
+                purchase({ sfl: EXTRA_REWARD_ATTEMPT_FLOWER_COST, items: {} })
+              }
+              disabled={!hasEnoughFlower}
+              className={`w-full px-6 py-3 rounded-lg font-bold transition-all shadow-lg text-sm ${
+                hasEnoughFlower
+                  ? "bg-amber-500 text-white hover:bg-amber-600 active:scale-95"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              BUY +1 REWARD ATTEMPT ({EXTRA_REWARD_ATTEMPT_FLOWER_COST} FLOWER)
+            </button>
+          )}
 
           {onClose && (
             <button

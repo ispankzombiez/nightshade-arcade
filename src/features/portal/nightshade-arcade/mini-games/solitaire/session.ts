@@ -1,8 +1,7 @@
 import { GameState } from "features/game/types/game";
 import {
-  getArcadeAttemptsUsedToday,
-  getMinigameAttemptsUsedToday,
   getTodayKey,
+  isRewardRunAvailableForMinigame,
 } from "../poker/session";
 
 export const SOLITAIRE_RAVEN_COIN_REWARD = 1;
@@ -73,9 +72,10 @@ export const isSolitaireRewardRunAvailable = ({
   isVip: boolean;
   now?: Date | number;
 }): boolean => {
-  if (isVip) {
-    return getMinigameAttemptsUsedToday(game, "solitaire" as any, now) === 0;
-  }
-
-  return getArcadeAttemptsUsedToday(game, now) === 0;
+  return isRewardRunAvailableForMinigame({
+    game,
+    minigame: "solitaire" as any,
+    isVip,
+    now,
+  });
 };

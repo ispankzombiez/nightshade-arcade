@@ -1,9 +1,8 @@
 import { GameState } from "features/game/types/game";
 import { MinigameName } from "features/game/types/minigames";
 import {
-  getArcadeAttemptsUsedToday,
-  getMinigameAttemptsUsedToday,
   getTodayKey,
+  isRewardRunAvailableForMinigame,
 } from "../poker/session";
 
 export const TETRIS_RAVEN_COIN_REWARD = 1;
@@ -86,11 +85,10 @@ export const isTetrisRewardRunAvailable = ({
   isVip: boolean;
   now?: Date | number;
 }): boolean => {
-  if (isVip) {
-    return (
-      getMinigameAttemptsUsedToday(game, "tetris" as MinigameName, now) === 0
-    );
-  }
-
-  return getArcadeAttemptsUsedToday(game, now) === 0;
+  return isRewardRunAvailableForMinigame({
+    game,
+    minigame: "tetris" as MinigameName,
+    isVip,
+    now,
+  });
 };

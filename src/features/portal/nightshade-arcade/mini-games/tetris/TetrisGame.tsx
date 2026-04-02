@@ -11,11 +11,19 @@ import { useSelector } from "@xstate/react";
 import { Button } from "components/ui/Button";
 import { InnerPanel, OuterPanel } from "components/ui/Panel";
 import { ITEM_DETAILS } from "features/game/types/images";
-import { startAttempt, submitScore } from "features/portal/lib/portalUtil";
+import {
+  purchase,
+  startAttempt,
+  submitScore,
+} from "features/portal/lib/portalUtil";
 import { useVipAccess } from "lib/utils/hooks/useVipAccess";
 import { PortalContext } from "../../lib/NightshadeArcadePortalProvider";
 import { PortalMachineState } from "../../lib/nightshadeArcadePortalMachine";
 import ravenCoinIcon from "features/portal/nightshade-arcade/assets/RavenCoin.webp";
+import {
+  EXTRA_REWARD_ATTEMPT_FLOWER_COST,
+  getRemainingPaidAttemptsForMinigame,
+} from "../poker/session";
 import {
   getTetrisDifficulty,
   isTetrisRewardRunAvailable,
@@ -543,6 +551,12 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
     () => isTetrisRewardRunAvailable({ game: portalGameState, isVip }),
     [portalGameState, isVip],
   );
+  const hasEnoughFlower =
+    Number(portalGameState.balance ?? 0) >= EXTRA_REWARD_ATTEMPT_FLOWER_COST;
+  const paidAttemptsRemaining = useMemo(
+    () => getRemainingPaidAttemptsForMinigame(portalGameState, "tetris" as any),
+    [portalGameState],
+  );
 
   const todaysDifficulty = useMemo(() => getTetrisDifficulty(), []);
 
@@ -868,13 +882,13 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
             </p>
           </div>
 
-          <InnerPanel className="bg-yellow-100 p-4">
+          <InnerPanel className="bg-amber-50 p-4">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-sm text-gray-700 font-semibold">
                   REWARD
                 </div>
-                <div className="flex items-center justify-center gap-1 text-2xl font-bold text-yellow-700">
+                <div className="flex items-center justify-center gap-1 text-2xl font-bold text-amber-800">
                   {TETRIS_RAVEN_COIN_REWARD}
                   <img
                     src={ravenCoinIcon}
@@ -885,7 +899,7 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
               </div>
               <div>
                 <div className="text-sm text-gray-700 font-semibold">TODAY</div>
-                <div className="text-2xl font-bold text-yellow-700">
+                <div className="text-2xl font-bold text-amber-800">
                   {todaysDifficulty.label}
                 </div>
               </div>
@@ -893,7 +907,7 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
                 <div className="text-sm text-gray-700 font-semibold">
                   TARGET
                 </div>
-                <div className="text-2xl font-bold text-yellow-700">
+                <div className="text-2xl font-bold text-amber-800">
                   {todaysDifficulty.targetScore}
                 </div>
               </div>
@@ -943,6 +957,22 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
               Play without spending today&apos;s reward attempt.
             </div>
           </button>
+
+          {!hasRewardRun && paidAttemptsRemaining > 0 && (
+            <button
+              onClick={() =>
+                purchase({ sfl: EXTRA_REWARD_ATTEMPT_FLOWER_COST, items: {} })
+              }
+              disabled={!hasEnoughFlower}
+              className={`w-full px-6 py-3 rounded-lg font-bold transition-all shadow-lg text-sm ${
+                hasEnoughFlower
+                  ? "bg-amber-500 text-white hover:bg-amber-600 active:scale-95"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              BUY +1 REWARD ATTEMPT ({EXTRA_REWARD_ATTEMPT_FLOWER_COST} FLOWER)
+            </button>
+          )}
 
           {onClose && (
             <button
@@ -1132,6 +1162,16 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
             {mode === "practice" && (
               <Button onClick={() => startSession("practice")}>
                 Restart Practice Run
+              </Button>
+            )}
+            {runtime.gameOver && !hasRewardRun && paidAttemptsRemaining > 0 && (
+              <Button
+                onClick={() =>
+                  purchase({ sfl: EXTRA_REWARD_ATTEMPT_FLOWER_COST, items: {} })
+                }
+                disabled={!hasEnoughFlower}
+              >
+                Buy Another Attempt ({EXTRA_REWARD_ATTEMPT_FLOWER_COST} FLOWER)
               </Button>
             )}
             {onClose && <Button onClick={() => onClose()}>Exit</Button>}

@@ -12,8 +12,16 @@ import { InnerPanel, OuterPanel } from "components/ui/Panel";
 import { SquareIcon } from "components/ui/SquareIcon";
 import { ITEM_DETAILS } from "features/game/types/images";
 import ravenCoinIcon from "features/portal/nightshade-arcade/assets/RavenCoin.webp";
-import { startAttempt, submitScore } from "features/portal/lib/portalUtil";
+import {
+  purchase,
+  startAttempt,
+  submitScore,
+} from "features/portal/lib/portalUtil";
 import { useVipAccess } from "lib/utils/hooks/useVipAccess";
+import {
+  EXTRA_REWARD_ATTEMPT_FLOWER_COST,
+  getRemainingPaidAttemptsForMinigame,
+} from "../poker/session";
 import { PortalContext } from "../../lib/NightshadeArcadePortalProvider";
 import { PortalMachineState } from "../../lib/nightshadeArcadePortalMachine";
 import { Card, CardRank, CardSuit } from "../poker/types";
@@ -222,6 +230,12 @@ export const SolitaireGame: React.FC<{ onClose?: () => void }> = ({
   const hasRewardRun = useMemo(
     () => isSolitaireRewardRunAvailable({ game: portalGameState, isVip }),
     [portalGameState, isVip],
+  );
+  const hasEnoughFlower =
+    Number(portalGameState.balance ?? 0) >= EXTRA_REWARD_ATTEMPT_FLOWER_COST;
+  const paidAttemptsRemaining = useMemo(
+    () => getRemainingPaidAttemptsForMinigame(portalGameState, "solitaire"),
+    [portalGameState],
   );
 
   const todaysDifficulty = useMemo(() => getSolitaireDifficulty(), []);
@@ -733,6 +747,22 @@ export const SolitaireGame: React.FC<{ onClose?: () => void }> = ({
               Play without spending today's reward attempt.
             </div>
           </button>
+
+          {!hasRewardRun && paidAttemptsRemaining > 0 && (
+            <button
+              onClick={() =>
+                purchase({ sfl: EXTRA_REWARD_ATTEMPT_FLOWER_COST, items: {} })
+              }
+              disabled={!hasEnoughFlower}
+              className={`w-full px-6 py-3 rounded-lg font-bold transition-all shadow-lg text-sm ${
+                hasEnoughFlower
+                  ? "bg-amber-500 text-white hover:bg-amber-600 active:scale-95"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              BUY +1 REWARD ATTEMPT ({EXTRA_REWARD_ATTEMPT_FLOWER_COST} FLOWER)
+            </button>
+          )}
 
           {onClose && (
             <button

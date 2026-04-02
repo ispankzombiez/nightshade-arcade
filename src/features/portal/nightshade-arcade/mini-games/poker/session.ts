@@ -16,6 +16,9 @@ export const NIGHTSHADE_ARCADE_MINIGAMES: MinigameName[] = [
 export const POKER_STARTING_CHIPS = 100;
 export const POKER_MAX_HANDS = 5;
 export const POKER_RAVEN_COIN_REWARD = 1;
+export const EXTRA_REWARD_ATTEMPT_FLOWER_COST = 5;
+export const MAX_PAID_REWARD_ATTEMPTS_PER_DAY = 2;
+export const MAX_REWARD_ATTEMPTS_PER_DAY = 3;
 
 export type PokerMode = "reward" | "practice";
 export type PokerDifficultyName = "easy" | "medium" | "hard" | "expert";
@@ -93,6 +96,57 @@ export const getMinigameAttemptsUsedToday = (
   return game.minigames.games[minigame]?.history?.[todayKey]?.attempts ?? 0;
 };
 
+export const getMinigamePurchasesUsedToday = (
+  game: GameState,
+  minigame: MinigameName,
+  now: Date | number = Date.now(),
+) => {
+  const todayKey = getTodayKey(now);
+
+  const purchases = game.minigames.games[minigame]?.purchases ?? [];
+
+  return purchases.reduce((total, purchase) => {
+    const purchaseDay = new Date(purchase.purchasedAt).toISOString().slice(0, 10);
+    return total + (purchaseDay === todayKey ? 1 : 0);
+  }, 0);
+};
+
+export const getRemainingPaidAttemptsForMinigame = (
+  game: GameState,
+  minigame: MinigameName,
+  now: Date | number = Date.now(),
+) => {
+  const purchasesUsed = getMinigamePurchasesUsedToday(game, minigame, now);
+  return Math.max(0, MAX_PAID_REWARD_ATTEMPTS_PER_DAY - purchasesUsed);
+};
+
+export const isRewardRunAvailableForMinigame = ({
+  game,
+  minigame,
+  isVip,
+  now = Date.now(),
+}: {
+  game: GameState;
+  minigame: MinigameName;
+  isVip: boolean;
+  now?: Date | number;
+}): boolean => {
+  const purchasedAttempts = Math.min(
+    getMinigamePurchasesUsedToday(game, minigame, now),
+    MAX_PAID_REWARD_ATTEMPTS_PER_DAY,
+  );
+  const totalAvailableRuns = Math.min(
+    MAX_REWARD_ATTEMPTS_PER_DAY,
+    1 + purchasedAttempts,
+  );
+
+  if (isVip) {
+    return getMinigameAttemptsUsedToday(game, minigame, now) < totalAvailableRuns;
+  }
+
+  return getArcadeAttemptsUsedToday(game, now) < totalAvailableRuns;
+};
+
 export const getPokerMode = ({
   game,
   isVip,
@@ -120,9 +174,10 @@ export const isRewardRunAvailable = ({
   isVip: boolean;
   now?: Date | number;
 }): boolean => {
-  if (isVip) {
-    return getMinigameAttemptsUsedToday(game, "poker", now) === 0;
-  }
-
-  return getArcadeAttemptsUsedToday(game, now) === 0;
+  return isRewardRunAvailableForMinigame({
+    game,
+    minigame: "poker",
+    isVip,
+    now,
+  });
 };

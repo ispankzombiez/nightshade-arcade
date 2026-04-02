@@ -15,10 +15,18 @@ import { ITEM_DETAILS } from "features/game/types/images";
 import spaceInvaderMap from "features/portal/nightshade-arcade/assets/space-invader-map.json";
 import arcadeTilesheet from "features/portal/nightshade-arcade/assets/nightshade-arcade-tilesheet.png";
 import ravenCoinIcon from "features/portal/nightshade-arcade/assets/RavenCoin.webp";
-import { startAttempt, submitScore } from "features/portal/lib/portalUtil";
+import {
+  purchase,
+  startAttempt,
+  submitScore,
+} from "features/portal/lib/portalUtil";
 import { useVipAccess } from "lib/utils/hooks/useVipAccess";
 import { NPCIcon } from "features/island/bumpkin/components/NPC";
 import { NPC_WEARABLES } from "lib/npcs";
+import {
+  EXTRA_REWARD_ATTEMPT_FLOWER_COST,
+  getRemainingPaidAttemptsForMinigame,
+} from "../poker/session";
 import { PortalContext } from "../../lib/NightshadeArcadePortalProvider";
 import { PortalMachineState } from "../../lib/nightshadeArcadePortalMachine";
 import {
@@ -225,6 +233,13 @@ export const GoblinInvadersGame: React.FC<{ onClose?: () => void }> = ({
   const hasRewardRun = useMemo(
     () => isGoblinInvadersRewardRunAvailable({ game: portalGameState, isVip }),
     [portalGameState, isVip],
+  );
+  const hasEnoughFlower =
+    Number(portalGameState.balance ?? 0) >= EXTRA_REWARD_ATTEMPT_FLOWER_COST;
+  const paidAttemptsRemaining = useMemo(
+    () =>
+      getRemainingPaidAttemptsForMinigame(portalGameState, "goblin-invaders"),
+    [portalGameState],
   );
 
   const todaysDifficulty = useMemo(() => getGoblinInvadersDifficulty(), []);
@@ -725,6 +740,22 @@ export const GoblinInvadersGame: React.FC<{ onClose?: () => void }> = ({
               Play without spending today&apos;s reward attempt.
             </div>
           </button>
+
+          {!hasRewardRun && paidAttemptsRemaining > 0 && (
+            <button
+              onClick={() =>
+                purchase({ sfl: EXTRA_REWARD_ATTEMPT_FLOWER_COST, items: {} })
+              }
+              disabled={!hasEnoughFlower}
+              className={`w-full px-6 py-3 rounded-lg font-bold transition-all shadow-lg text-sm ${
+                hasEnoughFlower
+                  ? "bg-amber-500 text-white hover:bg-amber-600 active:scale-95"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              BUY +1 REWARD ATTEMPT ({EXTRA_REWARD_ATTEMPT_FLOWER_COST} FLOWER)
+            </button>
+          )}
 
           {onClose && (
             <button

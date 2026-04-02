@@ -25,6 +25,7 @@ import { CONFIG } from "lib/config";
 import { getFont, getLanguage } from "../actions/loadPortal";
 import i18n from "lib/i18n";
 import { changeFont } from "lib/utils/fonts";
+import { EXTRA_REWARD_ATTEMPT_FLOWER_COST } from "./mini-games/poker/session";
 
 const _gameState = (state: PortalMachineState) => state.context.state;
 
@@ -144,6 +145,36 @@ export const NightshadeArcade: React.FC = () => {
       unsubscribeTetris();
     };
   }, []);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const isValidOrigin = true;
+
+      if (!isValidOrigin) {
+        return;
+      }
+
+      if (event.data?.event !== "purchased") {
+        return;
+      }
+
+      if (!activeMinigame) {
+        return;
+      }
+
+      portalService.send({
+        type: "arcadeMinigame.attemptPurchased",
+        name: activeMinigame,
+        flowerCost: EXTRA_REWARD_ATTEMPT_FLOWER_COST,
+      });
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [activeMinigame, portalService]);
 
   useEffect(() => {
     // load language from query params

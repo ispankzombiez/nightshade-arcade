@@ -1,7 +1,6 @@
 import { GameState } from "features/game/types/game";
 import {
-  getArcadeAttemptsUsedToday,
-  getMinigameAttemptsUsedToday,
+  isRewardRunAvailableForMinigame,
 } from "../poker/session";
 
 export const UNO_RAVEN_COIN_REWARD = 1;
@@ -17,9 +16,10 @@ export const isUnoRewardRunAvailable = ({
   isVip: boolean;
   now?: Date | number;
 }): boolean => {
-  if (isVip) {
-    return getMinigameAttemptsUsedToday(game, "uno", now) === 0;
-  }
-
-  return getArcadeAttemptsUsedToday(game, now) === 0;
+  return isRewardRunAvailableForMinigame({
+    game,
+    minigame: "uno",
+    isVip,
+    now,
+  });
 };

@@ -526,6 +526,10 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   public setUpNavMesh = () => {
+    if (!this.map || typeof this.map.getObjectLayer !== "function") {
+      return;
+    }
+
     const meshLayer = this.map.getObjectLayer("NavMesh");
     if (!meshLayer) return;
 

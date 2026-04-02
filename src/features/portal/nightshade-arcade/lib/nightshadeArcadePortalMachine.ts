@@ -8,6 +8,7 @@ import { PortalGameState } from "../types";
 import { OFFLINE_FARM } from "features/game/lib/landData";
 import { MinigameName } from "../types";
 import { Minigame } from "features/game/types/game";
+import { MAX_PAID_REWARD_ATTEMPTS_PER_DAY } from "../mini-games/poker/session";
 
 type ArcadeTier = "basic" | "rare" | "epic" | "mega";
 
@@ -34,6 +35,11 @@ export type PortalEvent =
   | { type: "dailyRavenCoins.claimed"; reward: number }
   | { type: "chapterItem.bought"; name: string; tier: ArcadeTier }
   | { type: "arcadeMinigame.started"; name: MinigameName }
+  | {
+      type: "arcadeMinigame.attemptPurchased";
+      name: MinigameName;
+      flowerCost: number;
+    }
   | { type: "arcadeMinigame.ravenCoinWon"; amount: number };
 
 export type PortalState = {
@@ -208,6 +214,62 @@ export const nightshadeArcadePortalMachine = createMachine({
                             attempts: daily.attempts + 1,
                           },
                         },
+                      },
+                    },
+                  },
+                };
+              },
+            }),
+          ],
+        },
+        "arcadeMinigame.attemptPurchased": {
+          actions: [
+            assign({
+              state: (context, event: any) => {
+                const { name, flowerCost } = event as {
+                  name: MinigameName;
+                  flowerCost: number;
+                };
+
+                const minigame = getArcadeMinigame(context.state, name);
+                const currentFlower = new Decimal(context.state.balance ?? 0);
+                const cost = new Decimal(flowerCost ?? 0);
+                const todayKey = new Date().toISOString().slice(0, 10);
+                const purchasesUsedToday = (minigame.purchases ?? []).reduce(
+                  (total, purchase) => {
+                    const purchaseDay = new Date(purchase.purchasedAt)
+                      .toISOString()
+                      .slice(0, 10);
+                    return total + (purchaseDay === todayKey ? 1 : 0);
+                  },
+                  0,
+                );
+
+                if (purchasesUsedToday >= MAX_PAID_REWARD_ATTEMPTS_PER_DAY) {
+                  return context.state;
+                }
+
+                if (currentFlower.lt(cost)) {
+                  return context.state;
+                }
+
+                return {
+                  ...context.state,
+                  balance: currentFlower.minus(cost),
+                  minigames: {
+                    ...context.state.minigames,
+                    games: {
+                      ...context.state.minigames.games,
+                      [name]: {
+                        ...minigame,
+                        purchases: [
+                          ...(minigame.purchases ?? []),
+                          {
+                            sfl: flowerCost,
+                            items: {},
+                            purchasedAt: Date.now(),
+                          },
+                        ],
                       },
                     },
                   },

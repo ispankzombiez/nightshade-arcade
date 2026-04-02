@@ -6,8 +6,7 @@ import { Card, CardRank } from "../poker/types";
 import { HandValue } from "./types";
 import {
   getTodayKey,
-  getArcadeAttemptsUsedToday,
-  getMinigameAttemptsUsedToday,
+  isRewardRunAvailableForMinigame,
 } from "../poker/session";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -92,11 +91,12 @@ export const isBlackjackRewardRunAvailable = ({
   isVip: boolean;
   now?: Date | number;
 }): boolean => {
-  if (isVip) {
-    return getMinigameAttemptsUsedToday(game, "blackjack", now) === 0;
-  }
-
-  return getArcadeAttemptsUsedToday(game, now) === 0;
+  return isRewardRunAvailableForMinigame({
+    game,
+    minigame: "blackjack",
+    isVip,
+    now,
+  });
 };
 
 // ─── Hand scoring ─────────────────────────────────────────────────────────────

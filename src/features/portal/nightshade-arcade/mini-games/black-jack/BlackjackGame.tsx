@@ -11,11 +11,19 @@ import { Card } from "../poker/types";
 import { BlackjackDeck } from "./deck";
 import { OuterPanel, InnerPanel } from "components/ui/Panel";
 import { ITEM_DETAILS } from "features/game/types/images";
-import { startAttempt, submitScore } from "features/portal/lib/portalUtil";
+import {
+  purchase,
+  startAttempt,
+  submitScore,
+} from "features/portal/lib/portalUtil";
 import ravenCoinIcon from "features/portal/nightshade-arcade/assets/RavenCoin.webp";
 import { PortalContext } from "../../lib/NightshadeArcadePortalProvider";
 import { PortalMachineState } from "../../lib/nightshadeArcadePortalMachine";
 import { useVipAccess } from "lib/utils/hooks/useVipAccess";
+import {
+  EXTRA_REWARD_ATTEMPT_FLOWER_COST,
+  getRemainingPaidAttemptsForMinigame,
+} from "../poker/session";
 import {
   BLACKJACK_BET_AMOUNTS,
   BlackjackBetAmount,
@@ -193,6 +201,12 @@ export const BlackjackGame: React.FC<BlackjackGameProps> = ({
   const hasRewardRun = useMemo(
     () => isBlackjackRewardRunAvailable({ game: portalGameState, isVip }),
     [portalGameState, isVip],
+  );
+  const hasEnoughFlower =
+    Number(portalGameState.balance ?? 0) >= EXTRA_REWARD_ATTEMPT_FLOWER_COST;
+  const paidAttemptsRemaining = useMemo(
+    () => getRemainingPaidAttemptsForMinigame(portalGameState, "blackjack"),
+    [portalGameState],
   );
 
   const realChips = initialChips || BLACKJACK_STARTING_CHIPS;
@@ -664,6 +678,22 @@ export const BlackjackGame: React.FC<BlackjackGameProps> = ({
               Play without spending today's reward attempt.
             </div>
           </button>
+
+          {!hasRewardRun && paidAttemptsRemaining > 0 && (
+            <button
+              onClick={() =>
+                purchase({ sfl: EXTRA_REWARD_ATTEMPT_FLOWER_COST, items: {} })
+              }
+              disabled={!hasEnoughFlower}
+              className={`w-full px-6 py-3 rounded-lg font-bold transition-all shadow-lg text-sm ${
+                hasEnoughFlower
+                  ? "bg-amber-500 text-white hover:bg-amber-600 active:scale-95"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              BUY +1 REWARD ATTEMPT ({EXTRA_REWARD_ATTEMPT_FLOWER_COST} FLOWER)
+            </button>
+          )}
 
           {onClose && (
             <button

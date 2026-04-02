@@ -1,8 +1,7 @@
 import { GameState } from "features/game/types/game";
 import {
-  getArcadeAttemptsUsedToday,
-  getMinigameAttemptsUsedToday,
   getTodayKey,
+  isRewardRunAvailableForMinigame,
 } from "../poker/session";
 
 export const GOBLIN_INVADERS_RAVEN_COIN_REWARD = 1;
@@ -99,11 +98,10 @@ export const isGoblinInvadersRewardRunAvailable = ({
   isVip: boolean;
   now?: Date | number;
 }): boolean => {
-  if (isVip) {
-    return (
-      getMinigameAttemptsUsedToday(game, "goblin-invaders" as any, now) === 0
-    );
-  }
-
-  return getArcadeAttemptsUsedToday(game, now) === 0;
+  return isRewardRunAvailableForMinigame({
+    game,
+    minigame: "goblin-invaders" as any,
+    isVip,
+    now,
+  });
 };
