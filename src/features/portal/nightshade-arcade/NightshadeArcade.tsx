@@ -129,6 +129,11 @@ export const NightshadeArcade: React.FC = () => {
       },
     );
 
+    const unsubscribeTetris = minigamesEventEmitter.subscribe("tetris", () => {
+      setActiveMinigame("tetris");
+      setShowMinigameModal(true);
+    });
+
     return () => {
       unsubscribePoker();
       unsubscribeBlackjack();
@@ -136,6 +141,7 @@ export const NightshadeArcade: React.FC = () => {
       unsubscribeUno();
       unsubscribeSolitaire();
       unsubscribeGoblinInvaders();
+      unsubscribeTetris();
     };
   }, []);
 
