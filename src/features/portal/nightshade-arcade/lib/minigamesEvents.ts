@@ -9,7 +9,8 @@ type MinigameType =
   | "roulette"
   | "blackjack"
   | "gofish"
-  | "uno";
+  | "uno"
+  | "solitaire";
 
 interface MinigameEvent {
   type: MinigameType;
