@@ -736,7 +736,7 @@ export const SolitaireGame: React.FC<{ onClose?: () => void }> = ({
 
           {onClose && (
             <button
-              onClick={() => setShowExitConfirm(true)}
+              onClick={() => onClose()}
               className="w-full px-6 py-2 bg-gray-400 text-white font-semibold rounded-lg hover:bg-gray-500 active:scale-95 transition-all"
             >
               EXIT
