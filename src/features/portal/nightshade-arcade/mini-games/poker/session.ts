@@ -11,6 +11,7 @@ export const NIGHTSHADE_ARCADE_MINIGAMES: MinigameName[] = [
   "solitaire" as MinigameName,
   "goblin-invaders" as MinigameName,
   "tetris" as MinigameName,
+  "pac-man" as MinigameName,
 ];
 
 export const POKER_STARTING_CHIPS = 100;
@@ -106,7 +107,9 @@ export const getMinigamePurchasesUsedToday = (
   const purchases = game.minigames.games[minigame]?.purchases ?? [];
 
   return purchases.reduce((total, purchase) => {
-    const purchaseDay = new Date(purchase.purchasedAt).toISOString().slice(0, 10);
+    const purchaseDay = new Date(purchase.purchasedAt)
+      .toISOString()
+      .slice(0, 10);
     return total + (purchaseDay === todayKey ? 1 : 0);
   }, 0);
 };
@@ -141,7 +144,9 @@ export const isRewardRunAvailableForMinigame = ({
   );
 
   if (isVip) {
-    return getMinigameAttemptsUsedToday(game, minigame, now) < totalAvailableRuns;
+    return (
+      getMinigameAttemptsUsedToday(game, minigame, now) < totalAvailableRuns
+    );
   }
 
   return getArcadeAttemptsUsedToday(game, now) < totalAvailableRuns;
