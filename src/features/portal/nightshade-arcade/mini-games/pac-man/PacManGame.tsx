@@ -955,7 +955,7 @@ export const PacManGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
       <OuterPanel className="mx-auto w-[min(98vw,1100px)] h-[min(95vh,900px)] overflow-hidden">
         <div className="flex h-full flex-col gap-6 overflow-y-auto p-6">
           <div className="text-center space-y-2">
-            <h2 className="text-4xl font-bold">PAC-MAN</h2>
+            <h2 className="text-4xl font-bold">BUMPKIN-MAN</h2>
             <p className="text-sm text-gray-600">
               Eat all the pellets, avoid the goblins — unless you find a Kale!
             </p>
@@ -1027,10 +1027,10 @@ export const PacManGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
             <div className="mt-2 text-xs opacity-90">
               {hasRewardRun
                 ? isVip
-                  ? "VIP: reward run available for Pac-Man today."
+                  ? "VIP: reward run available for Bumpkin-Man today."
                   : "Reward run available for the arcade today."
                 : isVip
-                  ? "VIP: today's Pac-Man reward run has already been used."
+                  ? "VIP: today's Bumpkin-Man reward run has already been used."
                   : "Today's arcade reward run has already been used."}
             </div>
           </button>
@@ -1125,7 +1125,7 @@ export const PacManGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
           {/* HUD */}
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
             <div className="font-bold text-lg text-yellow-400">
-              PAC-MAN – {activeDifficulty.label}
+              BUMPKIN-MAN – {activeDifficulty.label}
             </div>
             <div className="flex gap-2 items-center flex-wrap">
               <span className="px-2 py-1 rounded bg-slate-800">
@@ -1368,7 +1368,7 @@ export const PacManGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
         {showExitConfirm && (
           <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
             <div className="w-full max-w-sm bg-slate-900 rounded border border-white/30 p-5 text-white space-y-4">
-              <div className="font-bold text-lg">Exit Pac-Man?</div>
+              <div className="font-bold text-lg">Exit Bumpkin-Man?</div>
               <div className="text-sm text-slate-300">
                 Your progress will be lost.
               </div>
