@@ -248,6 +248,7 @@ export const GoblinInvadersGame: React.FC<{ onClose?: () => void }> = ({
   const [runtime, setRuntime] = useState<GoblinInvadersRuntime | null>(null);
   const [showPracticeDifficultyPrompt, setShowPracticeDifficultyPrompt] =
     useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [arenaBackgroundUrl, setArenaBackgroundUrl] = useState("");
   const [activeDifficulty, setActiveDifficulty] =
     useState<GoblinInvadersDifficulty>(todaysDifficulty);
@@ -258,6 +259,21 @@ export const GoblinInvadersGame: React.FC<{ onClose?: () => void }> = ({
   const rewardGrantedRef = useRef(false);
   const frameRef = useRef<number | null>(null);
   const lastFrameAtRef = useRef<number | null>(null);
+
+  const returnToMenu = useCallback(() => {
+    setShowExitConfirm(false);
+    setMode(null);
+    setRuntime(null);
+  }, []);
+
+  const handleInGameExit = useCallback(() => {
+    if (runtime?.gameOver) {
+      returnToMenu();
+      return;
+    }
+
+    setShowExitConfirm(true);
+  }, [returnToMenu, runtime?.gameOver]);
 
   const playerParts =
     portalGameState.bumpkin?.equipped ?? NPC_WEARABLES["pumpkin' pete"];
@@ -953,13 +969,37 @@ export const GoblinInvadersGame: React.FC<{ onClose?: () => void }> = ({
                 Restart Practice Run
               </Button>
             )}
-            {onClose && <Button onClick={() => onClose()}>Exit</Button>}
+            {onClose && <Button onClick={handleInGameExit}>Exit</Button>}
           </div>
 
           <div className="text-xs text-slate-300">
             Move with A/D or Arrow keys. Press Space to shoot. Enemy speed and
             fire rate increase as waves progress.
           </div>
+
+          {showExitConfirm && (
+            <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+              <div className="w-full max-w-sm bg-slate-900 rounded border border-white/30 p-5 text-white space-y-4">
+                <div className="font-bold text-lg">Exit Goblin Invaders?</div>
+                <div className="text-sm text-slate-300">
+                  Your current progress will be lost.
+                </div>
+                <div className="flex gap-3 justify-end">
+                  <Button onClick={() => setShowExitConfirm(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowExitConfirm(false);
+                      onClose?.();
+                    }}
+                  >
+                    Exit
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </InnerPanel>
     </OuterPanel>

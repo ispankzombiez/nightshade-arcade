@@ -227,6 +227,12 @@ export const GoFishGame: React.FC<GoFishGameProps> = ({ onClose }) => {
   const [rewardGranted, setRewardGranted] = useState(false);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
+  const returnToMenu = useCallback(() => {
+    setShowQuitConfirm(false);
+    setSessionMode(null);
+    setGameState(null);
+  }, []);
+
   const settleRewardRun = useCallback(() => {
     if (!gameState || !gameState.gameOver || sessionMode !== "reward") {
       return;
@@ -542,8 +548,8 @@ export const GoFishGame: React.FC<GoFishGameProps> = ({ onClose }) => {
 
   const handleExitAfterGame = useCallback(() => {
     settleRewardRun();
-    onClose?.();
-  }, [settleRewardRun, onClose]);
+    returnToMenu();
+  }, [returnToMenu, settleRewardRun]);
 
   const handlePlayAgainPractice = useCallback(() => {
     if (sessionMode !== "practice") {

@@ -230,6 +230,21 @@ export const BlackjackGame: React.FC<BlackjackGameProps> = ({
   const sessionComplete = sessionWon || sessionLost;
   const canPlayNextHand = gameState.status === "gameover" && !sessionComplete;
 
+  const handleSessionExit = () => {
+    if (sessionComplete) {
+      setShowRules(false);
+      setSessionMode(null);
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Exit Blackjack? Current game progress will be lost.",
+    );
+    if (!confirmed) return;
+
+    onClose?.();
+  };
+
   // ─── Card suit images (same assets as poker) ────────────────────────────────
 
   const suitImages: Record<string, string> = {
@@ -697,7 +712,7 @@ export const BlackjackGame: React.FC<BlackjackGameProps> = ({
 
           {onClose && (
             <button
-              onClick={onClose}
+              onClick={handleSessionExit}
               className="w-full px-6 py-2 bg-gray-400 text-white font-semibold rounded-lg hover:bg-gray-500 active:scale-95 transition-all"
             >
               EXIT
@@ -1016,7 +1031,7 @@ export const BlackjackGame: React.FC<BlackjackGameProps> = ({
 
               {onClose && (
                 <button
-                  onClick={onClose}
+                  onClick={handleSessionExit}
                   className="w-full px-4 py-2 bg-gray-400 text-white font-semibold rounded-lg hover:bg-gray-500 active:scale-95 transition-all"
                 >
                   {sessionComplete ? "EXIT BLACKJACK" : "BACK TO ARCADE"}

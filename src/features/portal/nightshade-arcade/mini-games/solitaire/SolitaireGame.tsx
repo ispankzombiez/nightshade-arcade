@@ -248,6 +248,15 @@ export const SolitaireGame: React.FC<{ onClose?: () => void }> = ({
   const [undoCount, setUndoCount] = useState(0);
   const [undosRemaining, setUndosRemaining] = useState(MAX_UNDOS_PER_GAME);
 
+  const returnToMenu = useCallback(() => {
+    setShowExitConfirm(false);
+    setSessionMode(null);
+    setGameState(null);
+    undoHistoryRef.current = [];
+    setUndoCount(0);
+    setUndosRemaining(MAX_UNDOS_PER_GAME);
+  }, []);
+
   const setGameStateWithUndo = useCallback(
     (updater: (previous: SolitaireState) => SolitaireState) => {
       setGameState((previous) => {
@@ -898,7 +907,18 @@ export const SolitaireGame: React.FC<{ onClose?: () => void }> = ({
               </Button>
               <Button onClick={autoMoveToFoundation}>Auto Foundation</Button>
               {onClose && (
-                <Button onClick={() => setShowExitConfirm(true)}>Exit</Button>
+                <Button
+                  onClick={() => {
+                    if (solved) {
+                      returnToMenu();
+                      return;
+                    }
+
+                    setShowExitConfirm(true);
+                  }}
+                >
+                  Exit
+                </Button>
               )}
             </div>
           </div>
@@ -980,7 +1000,18 @@ export const SolitaireGame: React.FC<{ onClose?: () => void }> = ({
                 <Button onClick={() => setShowExitConfirm(false)}>
                   CANCEL
                 </Button>
-                <Button onClick={() => onClose?.()}>EXIT</Button>
+                <Button
+                  onClick={() => {
+                    if (solved) {
+                      returnToMenu();
+                      return;
+                    }
+
+                    onClose?.();
+                  }}
+                >
+                  EXIT
+                </Button>
               </div>
             </div>
           </div>

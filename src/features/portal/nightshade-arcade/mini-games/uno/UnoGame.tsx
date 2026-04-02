@@ -253,6 +253,14 @@ export const UnoGame: React.FC<UnoGameProps> = ({ onClose }) => {
     [portalGameState],
   );
 
+  const returnToMenu = useCallback(() => {
+    setShowQuitConfirm(false);
+    setSessionMode(null);
+    setGameState(null);
+    setPendingWildCard(null);
+    botTurnActiveRef.current = false;
+  }, []);
+
   // ─── Reward settlement ────────────────────────────────────────────────────
 
   const settleRewardRun = useCallback(
@@ -891,7 +899,7 @@ export const UnoGame: React.FC<UnoGameProps> = ({ onClose }) => {
                   <Button
                     onClick={() => {
                       settleRewardRun(gameState);
-                      onClose?.();
+                      returnToMenu();
                     }}
                   >
                     EXIT

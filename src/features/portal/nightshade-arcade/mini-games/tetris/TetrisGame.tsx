@@ -564,6 +564,7 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const [runtime, setRuntime] = useState<TetrisRuntime | null>(null);
   const [showPracticeDifficultyPrompt, setShowPracticeDifficultyPrompt] =
     useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [activeDifficulty, setActiveDifficulty] =
     useState<TetrisDifficulty>(todaysDifficulty);
   const [practiceDifficultyName, setPracticeDifficultyName] =
@@ -573,6 +574,22 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const frameRef = useRef<number | null>(null);
   const lastFrameAtRef = useRef<number | null>(null);
   const softDropPressedRef = useRef(false);
+
+  const returnToMenu = useCallback(() => {
+    setShowExitConfirm(false);
+    setMode(null);
+    setRuntime(null);
+    softDropPressedRef.current = false;
+  }, []);
+
+  const handleInGameExit = useCallback(() => {
+    if (runtime?.gameOver) {
+      returnToMenu();
+      return;
+    }
+
+    setShowExitConfirm(true);
+  }, [returnToMenu, runtime?.gameOver]);
 
   const startSession = useCallback(
     (
@@ -1174,8 +1191,32 @@ export const TetrisGame: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
                 Buy Another Attempt ({EXTRA_REWARD_ATTEMPT_FLOWER_COST} FLOWER)
               </Button>
             )}
-            {onClose && <Button onClick={() => onClose()}>Exit</Button>}
+            {onClose && <Button onClick={handleInGameExit}>Exit</Button>}
           </div>
+
+          {showExitConfirm && (
+            <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+              <div className="w-full max-w-sm bg-slate-900 rounded border border-white/30 p-5 text-white space-y-4">
+                <div className="font-bold text-lg">Exit Tetris?</div>
+                <div className="text-sm text-slate-300">
+                  Your current progress will be lost.
+                </div>
+                <div className="flex gap-3 justify-end">
+                  <Button onClick={() => setShowExitConfirm(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowExitConfirm(false);
+                      onClose?.();
+                    }}
+                  >
+                    Exit
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </InnerPanel>
     </OuterPanel>

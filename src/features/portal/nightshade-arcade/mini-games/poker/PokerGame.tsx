@@ -299,6 +299,21 @@ export const PokerGame: React.FC<PokerGameProps> = ({
   const canAdvanceToNextHand =
     gameState.status === "gameover" && !sessionComplete;
 
+  const handleSessionExit = () => {
+    if (sessionComplete) {
+      setShowRules(false);
+      setSessionMode(null);
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Exit Poker? Current game progress will be lost.",
+    );
+    if (!confirmed) return;
+
+    onClose?.();
+  };
+
   const startHand = (startingChips: number) => {
     const newDeck = new PokerDeck();
     setDeck(newDeck);
@@ -724,7 +739,7 @@ export const PokerGame: React.FC<PokerGameProps> = ({
             </button>
             {onClose && (
               <button
-                onClick={onClose}
+                onClick={handleSessionExit}
                 className="px-6 py-3 bg-gray-400 text-white font-bold rounded-lg hover:bg-gray-500 active:scale-95 transition-all"
               >
                 ✕
@@ -1045,7 +1060,7 @@ export const PokerGame: React.FC<PokerGameProps> = ({
 
               {onClose && (
                 <button
-                  onClick={onClose}
+                  onClick={handleSessionExit}
                   className="w-full px-4 py-2 bg-gray-400 text-white font-semibold rounded-lg hover:bg-gray-500 active:scale-95 transition-all"
                 >
                   {sessionComplete ? "EXIT POKER" : "BACK TO ARCADE"}
